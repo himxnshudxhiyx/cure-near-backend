@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 const product_routes = require("./routes/product");
 const notes_routes = require("./routes/notes");
 const auth_routes = require("./routes/auth");
+const hospital_routes = require("./routes/hospitals");
 
 const connectDB = require("./db/connect");
 
@@ -24,6 +25,7 @@ app.use(express.static(path.join(__dirname, 'public'))); // Serve static files
 app.use("/api/products", product_routes)
 app.use("/api/notes", notes_routes)
 app.use("/api/auth", auth_routes)
+app.use("/api/hospitals", hospital_routes)
 
 const start = async () => {
     try {
