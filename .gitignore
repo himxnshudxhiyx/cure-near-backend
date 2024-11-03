@@ -1,4 +1,5 @@
 node_modules/.package-lock.json
+node_modules/
 node_modules/.bin/fxparser
 node_modules/.bin/mime
 node_modules/.bin/nodemon
@@ -6316,3 +6317,10 @@ node_modules/yocto-queue/index.js
 node_modules/yocto-queue/license
 node_modules/yocto-queue/package.json
 node_modules/yocto-queue/readme.md
+node_modules/fsevents/fsevents.d.ts
+node_modules/fsevents/fsevents.js
+node_modules/fsevents/fsevents.node
+node_modules/fsevents/LICENSE
+node_modules/fsevents/package.json
+node_modules/fsevents/README.md
+.env

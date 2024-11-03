@@ -9,7 +9,9 @@ const userSchema = new Schema({
     phoneNumber: { type: String, required: true }, // Changed to String
     verified: { type: Boolean, default: false },
     verificationToken: { type: String },
-    isLoggedIn: { type: Boolean, default: false } // Add this field
+    isLoggedIn: { type: Boolean, default: false }, // Add this field
+    authToken: { type: String },
+    fcmToken: { type: String },
 });
 
 module.exports = mongoose.model('User', userSchema);
