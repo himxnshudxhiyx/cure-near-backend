@@ -10,6 +10,7 @@ require("dotenv").config();
 const admin = require('firebase-admin');
 const db = require('../db/connect'); // Path to your Firebase initialization file
 const Hospital = require('../models/hospitals');
+const HospitalCategory = require('../models/hospitalCategories');
 
 const getNearbyHospitals = async (req, res) => {
     const { lat, long, search } = req.body; // Extract lat, long, and search query from the request body
@@ -20,12 +21,18 @@ const getNearbyHospitals = async (req, res) => {
     }
 
     try {
-        // Define the search radius in meters (e.g., 5 km)
-        const distanceInMeters = 5000; // 5 km
+        // Define the search radius in meters (e.g., 10 km)
+        const distanceInMeters = 10000; // 10 km
         const distanceInRadians = distanceInMeters / 6378137; // Convert distance to radians
 
         // Build the search query for the hospital name or other attributes
-        const searchQuery = search ? { name: { $regex: search, $options: "i" } } : {};
+        // Build the search query
+        const searchQuery = {
+            $or: [
+                search ? { name: { $regex: search, $options: "i" } } : {},
+                search ? { services: { $regex: search, $options: "i" } } : {}
+            ]
+        };
 
         // Find nearby hospitals using geospatial query
         const hospitals = await Hospital.find({
@@ -36,6 +43,8 @@ const getNearbyHospitals = async (req, res) => {
             },
             ...searchQuery // Combine with search query
         });
+
+        // const {__v, ...updatedHospitalsJson} = hospitals.toObject();
 
         res.status(200).json({
             data: hospitals,
@@ -48,8 +57,23 @@ const getNearbyHospitals = async (req, res) => {
     }
 };
 
+
+
+//Demo Json ->
+// {
+//     "lat": "28.9945832",
+//     "long": "77.0281157",
+//     "name": "Dudeja Hospital",
+//     "address": "ASDASDASDASD",
+//     "phone": "+918888888888",
+//     "services": ["Ear"],
+//     "categgory": "Cardiality"
+// }
+
 const addNewHospital = async (req, res) => {
-    const { name, address, lat, long, phone, services } = req.body; // Extract hospital data from the request body
+
+   
+    const { name, address, lat, long, phone, services, category} = req.body; // Extract hospital data from the request body
 
     // Validate required fields
     if (!name || !address || !lat || !long) {
@@ -57,6 +81,16 @@ const addNewHospital = async (req, res) => {
     }
 
     try {
+
+        const existingHospital = await Hospital.findOne({ 
+            name: name,
+            phone: phone 
+        });
+
+        if (existingHospital) {
+            return res.status(400).json({ message: "Hospital already exists.", status: 400 });
+        }
+
         // Create a new hospital instance
         const newHospital = new Hospital({
             name,
@@ -66,7 +100,8 @@ const addNewHospital = async (req, res) => {
                 coordinates: [parseFloat(long), parseFloat(lat)] // Longitude first for GeoJSON
             },
             phone: phone || null, // Optional phone number
-            services: services || [] // Optional array of services provided
+            services: services || [], // Optional array of services provided
+            category: category
         });
 
         // Save the new hospital to the database
@@ -84,4 +119,41 @@ const addNewHospital = async (req, res) => {
     }
 };
 
-module.exports = { getNearbyHospitals, addNewHospital };
+// const saveHospitalCategories = async () => {
+//     const categories = [
+//         "Dentistry", "Cardiology", "Neurology", "Orthopedics", 
+//         "Pediatrics", "Obstetrics and Gynecology", "Oncology", 
+//         "Gastroenterology", "Endocrinology", "Pulmonology", 
+//         "Dermatology", "Psychiatry", "Urology", "Rheumatology", 
+//         "Ophthalmology", "Emergency Medicine", "Radiology", 
+//         "Plastic Surgery", "Anesthesiology", "Hematology"
+//     ];
+
+//     for (const categoryName of categories) {
+//         const category = new HospitalCategory({ name: categoryName });
+//         await category.save();
+//     }
+
+//     console.log("Hospital categories saved successfully.");
+// };
+
+
+const getHospitalCategories = async (req, res) => {
+    try {
+        // Retrieve all hospital categories from the database
+        const categories = await HospitalCategory.find();
+
+        // Respond with the list of categories
+        res.status(200).json({
+            data: categories,
+            status: 200,
+            message: "Hospital categories fetched successfully"
+        });
+    } catch (err) {
+        console.error("Error retrieving hospital categories:", err);
+        res.status(500).json({ message: "Error retrieving hospital categories", error: err.message, status: 500 });
+    }
+};
+
+
+module.exports = { getNearbyHospitals, addNewHospital, getHospitalCategories };

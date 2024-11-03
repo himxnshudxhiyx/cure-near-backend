@@ -2,14 +2,17 @@ const mongoose = require('mongoose');
 
 // Define the Hospital schema
 const hospitalSchema = new mongoose.Schema({
-    name: { type: String, required: true }, // Name of the hospital
-    address: { type: String, required: true }, // Address of the hospital
+    name: { type: String, required: true },
+    address: { type: String, required: true },
     location: {
-        type: { type: String, enum: ['Point'], required: true }, // Type must be 'Point' for GeoJSON
-        coordinates: { type: [Number], required: true } // [longitude, latitude]
+        type: { type: String, enum: ['Point'], required: true },
+        coordinates: { type: [Number], required: true }
     },
-    phone: { type: String }, // Optional phone number
-    services: { type: [String] } // Optional array of services provided
+    phone: { type: String },
+    services: { type: [String] },
+    category: { type: String, required: true },
+}, {
+    toJSON: { versionKey: false } // Exclude the __v field from JSON output
 });
 
 // Create a geospatial index for the location field
