@@ -1,0 +1,32 @@
+[
+    {
+        "name": "iPhone 13",
+        "price": 41999,
+        "feature": true,
+        "company": "Apple"
+    },
+    {
+        "name": "iPhone 12",
+        "price": 45999,
+        "feature": true,
+        "company": "Apple"
+    },
+    {
+        "name": "iPhone 11",
+        "price": 52999,
+        "feature": false,
+        "company": "Apple"
+    },
+    {
+        "name": "iPhone X",
+        "price": 30000,
+        "feature": false,
+        "company": "Apple"
+    },
+    {
+        "name": "Nokia 1200",
+        "price": 100000,
+        "feature": false,
+        "company": "Nokia"
+    }
+]
