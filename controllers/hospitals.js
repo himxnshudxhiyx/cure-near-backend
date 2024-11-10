@@ -67,7 +67,7 @@ const getNearbyHospitals = async (req, res) => {
 //     "address": "ASDASDASDASD",
 //     "phone": "+918888888888",
 //     "services": ["Ear"],
-//     "categgory": "Cardiality"
+//     "category": "Cardiality"
 // }
 
 const addNewHospital = async (req, res) => {
