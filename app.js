@@ -14,7 +14,7 @@ const hospital_routes = require("./routes/hospitals");
 const connectDB = require("./db/connect");
 
 app.get("/", (req, res) => {
-    res.send("Hi, I'm live");
+    res.send("Welcome to Cure Near");
 });
 
 app.use(express.json()); // Middleware to parse JSON bodies

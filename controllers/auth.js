@@ -117,7 +117,7 @@ const signup = async (req, res) => {
 
         const verificationLink = process.env.DEBUG_MODE === "true"
             ? `http://localhost:3000/api/auth/verify-email?token=${verificationToken}`
-            : `https://notes-node-theta.vercel.app/api/auth/verify-email?token=${verificationToken}`;
+            : `https://cure-near-backend.vercel.app/api/auth/verify-email?token=${verificationToken}`;
 
         const mailOptions = {
             from: "himanshud.dahiya@gmail.com",
