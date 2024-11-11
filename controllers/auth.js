@@ -78,7 +78,8 @@ const getAllUsersWithDetails = async (req, res) => {
 
 
 const signup = async (req, res) => {
-    const { username, password, firstName, lastName, phoneNumberReq } = req.body;
+    // const { username, password, firstName, lastName, phoneNumberReq } = req.body;
+    const { username, password, fullname} = req.body;
 
     try {
         // Check if username already exists
@@ -87,7 +88,7 @@ const signup = async (req, res) => {
             return res.status(400).json({ message: "Username already exists", status: 400 });
         }
 
-        const phoneNumber = String(phoneNumberReq);
+        // const phoneNumber = String(phoneNumberReq);
 
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -100,9 +101,10 @@ const signup = async (req, res) => {
             username,
             password: hashedPassword,
             verificationToken,
-            firstName,
-            lastName,
-            phoneNumber,
+            fullname,
+            // firstName,
+            // lastName,
+            // phoneNumber,
             isLoggedIn: false
         });
 
@@ -135,6 +137,44 @@ const signup = async (req, res) => {
     } catch (err) {
         console.error("Error registering user:", err);
         res.status(500).json({ message: "Error registering user", error: err.message, status: 500 });
+    }
+};
+
+
+const profileSetup = async (req, res) => {
+    try {
+        // Destructure required fields
+        const { userId, dateOfBirth, gender, phoneNumber } = req.body;
+        const profileImage = req.file ? req.file.path : null;  // Get path from multer upload
+
+        // Validate required fields
+        if (!userId || !dateOfBirth || !gender || !phoneNumber || !profileImage) {
+            return res.status(400).json({ message: "All fields are required.", status: 400 });
+        }
+
+        // Find the user by userId
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found.", status: 404 });
+        }
+
+        // Update user fields
+        user.profileImage = profileImage;
+        user.dateOfBirth = new Date(dateOfBirth);
+        user.gender = gender;
+        user.phoneNumber = phoneNumber;
+
+        // Save the updated user profile
+        await user.save();
+
+        res.status(200).json({
+            message: "Profile updated successfully!",
+            user: user,
+            status: 200
+        });
+    } catch (error) {
+        res.status(500).json({ message: "An error occurred while updating the profile.", error: error, status: 500 });
     }
 };
 
@@ -233,4 +273,4 @@ const logout = async (req, res) => {
 };
 
 
-module.exports = { signup, login, checkUser, verifyEmail, logout, getAllUsersWithDetails };
+module.exports = { signup, login, checkUser, verifyEmail, logout, getAllUsersWithDetails, profileSetup };
