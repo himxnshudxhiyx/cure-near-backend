@@ -148,7 +148,7 @@ const profileSetup = async (req, res) => {
         const profileImage = req.file ? req.file.path : null;  // Get path from multer upload
 
         // Validate required fields
-        if (!userId || !dateOfBirth || !gender || !phoneNumber || !profileImage) {
+        if (!userId || !dateOfBirth || !gender || !phoneNumber) {
             return res.status(400).json({ message: "All fields are required.", status: 400 });
         }
 
@@ -160,7 +160,7 @@ const profileSetup = async (req, res) => {
         }
 
         // Update user fields
-        user.profileImage = profileImage;
+        user.profileImage = profileImage ?? '';
         user.dateOfBirth = new Date(dateOfBirth);
         user.gender = gender;
         user.phoneNumber = phoneNumber;
