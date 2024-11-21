@@ -17,6 +17,7 @@ const userSchema = new Schema({
     dateOfBirth: { type: Date },
     gender: { type: String },
     userId: { type: String },
+    isProfileSetup: { type: Boolean },
 });
 
 module.exports = mongoose.model('User', userSchema);

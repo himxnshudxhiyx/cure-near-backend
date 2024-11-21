@@ -105,7 +105,8 @@ const signup = async (req, res) => {
             // firstName,
             // lastName,
             // phoneNumber,
-            isLoggedIn: false
+            isLoggedIn: false,
+            isProfileSetup: false,
         });
 
         // Send verification email
@@ -164,13 +165,17 @@ const profileSetup = async (req, res) => {
         user.dateOfBirth = new Date(dateOfBirth);
         user.gender = gender;
         user.phoneNumber = phoneNumber;
+        user.isProfileSetup = true;
 
         // Save the updated user profile
         await user.save();
 
+        const newUser = await User.findOne({ _id: userId });
+        const { password: _, authToken: __, __v, ...userWithoutSensitiveData } = newUser.toObject();
+
         res.status(200).json({
             message: "Profile updated successfully!",
-            user: user,
+            user: userWithoutSensitiveData,
             status: 200
         });
     } catch (error) {
@@ -196,8 +201,8 @@ const verifyEmail = async (req, res) => {
         );
 
         // Redirect to success page or send a success message
-        res.redirect('/public/verification-success.html');
-        // res.status(200).json({ message: "Email verified successfully" });
+        // res.redirect('/public/verification-success.html');
+        res.status(200).json({ message: "Email verified successfully" });
     } catch (err) {
         console.error("Error verifying email:", err);
         res.status(500).json({ message: "Error verifying email", error: err.message });
