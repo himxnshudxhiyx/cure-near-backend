@@ -93,8 +93,16 @@ const getBookingsOfUser = async (req, res) => {
         }
 
         // Fetch bookings based on the userId and status filter
-        const bookings = await Booking.find({ userId, ...statusFilter }).populate('doctorId', 'name category');
-
+        const bookings = await Booking.find({ userId, ...statusFilter })
+        .populate({
+            path: 'doctorId',
+            select: 'name category', // Fields from the doctor document
+            populate: {
+                path: 'hospitalId', // Populate the hospitalId field (which references the Hospital model)
+                select: 'name address location' // Specify the fields you want from the Hospital model (name and address)
+            }
+        });
+        
         if (bookings.length === 0) {
             return res.status(404).json({ message: "No bookings found", status: 404 });
         }
