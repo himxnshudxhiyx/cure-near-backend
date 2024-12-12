@@ -1,4 +1,4 @@
-// controllers/nearByHospitals.js
+// controllers/hospitals.js
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -13,7 +13,7 @@ const Hospital = require('../models/hospitals');
 const HospitalCategory = require('../models/hospitalCategories');
 
 const getNearbyHospitals = async (req, res) => {
-    const { lat, long, search } = req.body; // Extract lat, long, and search query from the request body
+    const { lat, long, search, cat } = req.body; // Extract lat, long, and search query from the request body
 
     // Validate latitude and longitude
     if (!lat || !long) {
@@ -27,12 +27,26 @@ const getNearbyHospitals = async (req, res) => {
 
         // Build the search query for the hospital name or other attributes
         // Build the search query
-        const searchQuery = {
-            $or: [
-                search ? { name: { $regex: search, $options: "i" } } : {},
-                search ? { services: { $regex: search, $options: "i" } } : {}
-            ]
-        };
+        // const searchQuery = {
+        //     $or: [
+        //         search ? { name: { $regex: search, $options: "i" } } : {},
+        //         search ? { services: { $regex: search, $options: "i" } } : {},
+        //     ]
+        // };
+
+        const searchConditions = [];
+
+        // Add conditions only if the corresponding variables are present
+        if (search != "") {
+            searchConditions.push({ name: { $regex: search, $options: "i" } });
+            searchConditions.push({ services: { $regex: search, $options: "i" } });
+        }
+
+        if (cat != "") {
+            searchConditions.push({ category: { $regex: cat, $options: "i" } });
+        }
+
+        const searchQuery = searchConditions.length > 0 ? { $or: searchConditions } : {};
 
         // Find nearby hospitals using geospatial query
         const hospitals = await Hospital.find({
@@ -44,10 +58,9 @@ const getNearbyHospitals = async (req, res) => {
             ...searchQuery // Combine with search query
         });
 
-        // const {__v, ...updatedHospitalsJson} = hospitals.toObject();
-
         res.status(200).json({
             data: hospitals,
+            totalRecords: hospitals.length,
             status: 200,
             message: "Hospitals list fetched successfully"
         }); // Return the list of hospitals
@@ -67,13 +80,13 @@ const getNearbyHospitals = async (req, res) => {
 //     "address": "ASDASDASDASD",
 //     "phone": "+918888888888",
 //     "services": ["Ear"],
-//     "category": "Cardiality"
+//     "category": ["Cardiality"]
 // }
 
 const addNewHospital = async (req, res) => {
 
-   
-    const { name, address, lat, long, phone, services, category} = req.body; // Extract hospital data from the request body
+
+    const { name, address, lat, long, phone, services, category } = req.body; // Extract hospital data from the request body
 
     // Validate required fields
     if (!name || !address || !lat || !long) {
@@ -82,9 +95,9 @@ const addNewHospital = async (req, res) => {
 
     try {
 
-        const existingHospital = await Hospital.findOne({ 
+        const existingHospital = await Hospital.findOne({
             name: name,
-            phone: phone 
+            phone: phone
         });
 
         if (existingHospital) {

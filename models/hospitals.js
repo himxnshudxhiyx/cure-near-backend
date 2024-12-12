@@ -10,7 +10,7 @@ const hospitalSchema = new mongoose.Schema({
     },
     phone: { type: String },
     services: { type: [String] },
-    category: { type: String, required: true },
+    category: { type: [String], required: true },
 }, {
     toJSON: { versionKey: false } // Exclude the __v field from JSON output
 });

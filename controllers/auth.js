@@ -13,8 +13,7 @@ const db = require('../db/connect'); // Path to your Firebase initialization fil
 
 const checkUser = async (req, res) => {
     try {
-        // Retrieve user ID from the request object (populated by authMiddleware)
-        const userId = req.user.id; // Ensure `user.id` corresponds to MongoDB's `_id`
+        const userId = req.user.id;
 
         // Find the user in MongoDB
         const user = await User.findById(userId);

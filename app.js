@@ -10,6 +10,7 @@ const product_routes = require("./routes/product");
 const notes_routes = require("./routes/notes");
 const auth_routes = require("./routes/auth");
 const hospital_routes = require("./routes/hospitals");
+const doctor_routes = require("./routes/doctors");
 
 const connectDB = require("./db/connect");
 
@@ -26,6 +27,7 @@ app.use("/api/products", product_routes)
 app.use("/api/notes", notes_routes)
 app.use("/api/auth", auth_routes)
 app.use("/api/hospitals", hospital_routes)
+app.use("/api/doctors", doctor_routes)
 
 const start = async () => {
     try {
