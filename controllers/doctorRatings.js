@@ -1,3 +1,4 @@
+const { default: mongoose } = require('mongoose');
 const DoctorRatings = require('../models/doctorRatings');
 const Doctors = require('../models/doctors'); // To verify the doctor exists
 
@@ -44,4 +45,30 @@ const addReviewForDoctor = async (req, res) => {
     }
 };
 
-module.exports = { addReviewForDoctor};
+const getRatingsOfDoctor = async (req, res) => {
+    try {
+        const { doctorId } = req.params; // Get the doctorId from the URL parameters
+
+        // Convert doctorId to ObjectId for querying
+        const objectId = new mongoose.Types.ObjectId(doctorId);
+
+        // Find all ratings for this doctor and sort by createdAt in descending order (latest first)
+        const ratings = await DoctorRatings.find({ doctorId: objectId })
+            .sort({ createdAt: -1 }); // Sort by createdAt in descending order
+
+        if (ratings.length === 0) {
+            return res.status(404).json({ message: "No ratings found for this doctor", status: 404 });
+        }
+
+        res.status(200).json({
+            message: "Ratings retrieved successfully",
+            ratings,
+            status: 200
+        });
+    } catch (error) {
+        console.error("Error retrieving doctor ratings:", error);
+        res.status(500).json({ message: "An error occurred", error: error.message, status: 500 });
+    }
+};
+
+module.exports = { addReviewForDoctor, getRatingsOfDoctor};
