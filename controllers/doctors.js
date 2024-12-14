@@ -4,6 +4,7 @@ const { default: mongoose } = require('mongoose');
 const DoctorRatings = require('../models/doctorRatings');
 const Doctors = require('../models/doctors'); // Import the Doctor model
 const Hospital = require('../models/hospitals'); // Import the Hospital model (assumes you have a Hospital model)
+const Booking = require('../models/booking');
 
 // Function to add a doctor to a hospital
 const addDoctorToHospital = async (req, res) => {
@@ -92,4 +93,48 @@ const getDoctorDetails = async (req, res) => {
     }
 };
 
-module.exports = { addDoctorToHospital, getDoctorDetails };
+const markAppointmentStatus = async (req, res) => {
+    try {
+        const { appointmentId, doctorId, status } = req.body; // Extract appointmentId, doctorId, and status from the request body
+
+        // Validate input fields
+        if (!appointmentId || !doctorId || !status) {
+            return res.status(400).json({ message: "Appointment ID, Doctor ID, and status are required.", status: 400 });
+        }
+
+        // Validate the status
+        const validStatuses = ["Completed", "Cancelled"];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({ message: "Invalid status. Allowed statuses are 'Completed' or 'Cancelled'.", status: 400 });
+        }
+
+        // Find the appointment
+        const appointment = await Booking.findById(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({ message: "Appointment not found.", status: 404 });
+        }
+
+        // Check if the doctor ID matches the doctor assigned to the appointment
+        if (appointment.doctorId.toString() !== doctorId) {
+            return res.status(403).json({
+                message: "Doctor is not authorized to update this appointment.",
+                status: 403
+            });
+        }
+
+        // Update the appointment status
+        appointment.status = status;
+        await appointment.save();
+
+        res.status(200).json({
+            message: `Appointment marked as ${status} successfully.`,
+            appointment,
+            status: 200
+        });
+    } catch (error) {
+        console.error("Error updating appointment status:", error);
+        res.status(500).json({ message: "An error occurred while updating the appointment status.", error: error.message, status: 500 });
+    }
+};
+
+module.exports = { addDoctorToHospital, getDoctorDetails, markAppointmentStatus };
