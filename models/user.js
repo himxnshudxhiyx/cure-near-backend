@@ -7,10 +7,10 @@ const userSchema = new Schema({
     fullname: { type: String, required: false },
     firstName: { type: String, required: false },
     lastName: { type: String, required: false },
-    phoneNumber: { type: String, required: false }, // Changed to String
+    phoneNumber: { type: String, required: false },
     verified: { type: Boolean, default: false },
     verificationToken: { type: String },
-    isLoggedIn: { type: Boolean, default: false }, // Add this field
+    isLoggedIn: { type: Boolean, default: false },
     authToken: { type: String },
     fcmToken: { type: String },
     profileImage: { type: String },
@@ -18,6 +18,8 @@ const userSchema = new Schema({
     gender: { type: String },
     userId: { type: String },
     isProfileSetup: { type: Boolean },
+    otp: { type: Number },
+    otpExpiry: { type: Date },
 });
 
 module.exports = mongoose.model('User', userSchema);
